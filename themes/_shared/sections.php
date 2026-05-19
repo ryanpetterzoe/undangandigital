@@ -84,33 +84,40 @@ $wanitaShort = $pick($wanita['nama_panggilan'] ?? null, $wanita['nama'] ?? null,
       <p class="prose"><?= nl2br(h($invitation['doa_restu'] ?: 'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud menyelenggarakan acara pernikahan putra-putri kami:')) ?></p>
 
       <div class="mempelai-grid">
-        <?php $first = $wanita; $second = $pria; ?>
-        <?php foreach ([$first, $second] as $idx => $d): if (!$d) continue; ?>
-          <div class="mempelai" data-aos="fade-up">
-            <?php if (!empty($d['foto'])): ?>
-              <img src="<?= h(upload_url($d['foto'])) ?>" alt="" class="mempelai-photo">
-            <?php else: ?>
-              <div class="mempelai-photo placeholder" aria-hidden="true">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </div>
-            <?php endif; ?>
-            <h4 class="mempelai-name"><?= h(!empty($d['nama']) ? $d['nama'] : '—') ?></h4>
-            <?php if (!empty($d['deskripsi'])): ?><p class="mempelai-desc"><?= h($d['deskripsi']) ?></p><?php endif; ?>
-            <?php $hasOrtu = !empty($d['ayah']) || !empty($d['ibu']); ?>
-            <?php if ($hasOrtu): ?>
-              <p class="mempelai-meta">Putra/Putri dari</p>
-              <?php if (!empty($d['ayah'])): ?><p class="mempelai-meta">Bapak <strong><?= h($d['ayah']) ?></strong></p><?php endif; ?>
-              <?php if (!empty($d['ibu'])):  ?><p class="mempelai-meta"><?= !empty($d['ayah']) ? '&amp; ' : '' ?>Ibu <strong><?= h($d['ibu']) ?></strong></p><?php endif; ?>
-            <?php endif; ?>
-            <?php if (!empty($d['instagram'])): ?>
-              <a href="https://instagram.com/<?= h(ltrim($d['instagram'],'@')) ?>" target="_blank" class="ig-link">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4A4 4 0 1 1 12.6 8 4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                <span>@<?= h(ltrim($d['instagram'],'@')) ?></span>
-              </a>
-            <?php endif; ?>
+<?php
+$mlist = array_values(array_filter([$wanita, $pria]));
+$mtotal = count($mlist);
+foreach ($mlist as $idx => $d):
+?>
+        <div class="mempelai" data-aos="fade-up">
+<?php if (!empty($d['foto'])): ?>
+          <img src="<?= h(upload_url($d['foto'])) ?>" alt="" class="mempelai-photo">
+<?php else: ?>
+          <div class="mempelai-photo placeholder" aria-hidden="true">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
-          <?php if ($idx === 0): ?><div class="mempelai-amp" aria-hidden="true">&amp;</div><?php endif; ?>
-        <?php endforeach; ?>
+<?php endif; ?>
+          <h4 class="mempelai-name"><?= h(!empty($d['nama']) ? $d['nama'] : '—') ?></h4>
+<?php if (!empty($d['deskripsi'])): ?>
+          <p class="mempelai-desc"><?= h($d['deskripsi']) ?></p>
+<?php endif; ?>
+<?php $hasOrtu = !empty($d['ayah']) || !empty($d['ibu']); if ($hasOrtu): ?>
+          <p class="mempelai-meta">Putra/Putri dari</p>
+<?php if (!empty($d['ayah'])): ?>
+          <p class="mempelai-meta">Bapak <strong><?= h($d['ayah']) ?></strong></p>
+<?php endif; if (!empty($d['ibu'])): ?>
+          <p class="mempelai-meta"><?= !empty($d['ayah']) ? '&amp; ' : '' ?>Ibu <strong><?= h($d['ibu']) ?></strong></p>
+<?php endif; endif; ?>
+<?php if (!empty($d['instagram'])): ?>
+          <a href="https://instagram.com/<?= h(ltrim($d['instagram'],'@')) ?>" target="_blank" class="ig-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4A4 4 0 1 1 12.6 8 4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            <span>@<?= h(ltrim($d['instagram'],'@')) ?></span>
+          </a>
+<?php endif; ?>
+        </div>
+<?php if ($idx < $mtotal - 1): ?>
+        <div class="mempelai-amp" aria-hidden="true">&amp;</div>
+<?php endif; endforeach; ?>
       </div>
     </article>
   </section>

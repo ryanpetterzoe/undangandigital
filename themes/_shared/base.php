@@ -36,7 +36,7 @@ $themeSlug = $themeSlug ?? ($invitation['tema'] ?? 'theme01');
 <style>:root { --bg-image: url('<?= h($bg) ?>'); }</style>
 <?php endif; ?>
 </head>
-<body class="theme-<?= h($themeSlug) ?>">
+<body class="theme-<?= h($themeSlug) ?><?= $bg ? ' has-bg' : '' ?>">
 <div class="bg-layer"></div>
 <div class="bg-overlay"></div>
 
