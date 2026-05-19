@@ -7,6 +7,10 @@
     # Auto-detect base path (mendukung subdir & vhost root)
     # Pastikan AllowOverride All di vhost config
 
+    # Redirect duplicate slashes "//" -> "/" (canonical URL)
+    RewriteCond %{THE_REQUEST} \s/+([^?\s]*?)//+([^\s]*) [NC]
+    RewriteRule ^ /%1/%2 [R=301,L,NE]
+
     # Block direct access to sensitive files
     RewriteRule ^(\.|config\.php|schema\.sql|composer\.(json|lock)) - [F,L]
 

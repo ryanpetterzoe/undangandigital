@@ -10,13 +10,21 @@ $tgt     = !empty($_GET['to']) ? h((string)$_GET['to']) : '';
 $countdownTo = null;
 foreach ($events as $e) { if (stripos($e['jenis'],'akad') !== false) { $countdownTo = $e['tanggal_mulai']; break; } }
 if (!$countdownTo && !empty($events)) $countdownTo = $events[0]['tanggal_mulai'];
+
+/* Helper: pick first non-empty value (handles empty strings unlike ??). */
+$pick = static function(...$vals) {
+    foreach ($vals as $v) { if ($v !== null && $v !== '') return $v; }
+    return '';
+};
+$priaShort   = $pick($pria['nama_panggilan']   ?? null, $pria['nama']   ?? null, 'Pria');
+$wanitaShort = $pick($wanita['nama_panggilan'] ?? null, $wanita['nama'] ?? null, 'Wanita');
 ?>
 
 <!-- ============= COVER ============= -->
 <section id="cover" class="cover-section">
   <div class="cover-inner">
     <p class="cover-eyebrow">The Wedding Of</p>
-    <h1 class="cover-title"><?= h($pria['nama_panggilan'] ?? $pria['nama'] ?? 'Pria') ?> &amp; <?= h($wanita['nama_panggilan'] ?? $wanita['nama'] ?? 'Wanita') ?></h1>
+    <h1 class="cover-title"><?= h($priaShort) ?> &amp; <?= h($wanitaShort) ?></h1>
     <div class="cover-divider"><span class="line"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.5-9.5-9C1.2 9 3 5 7 5c2 0 3.5 1 5 3 1.5-2 3-3 5-3 4 0 5.8 4 4.5 7-2 4.5-9.5 9-9.5 9z"/></svg><span class="line"></span></div>
     <p class="cover-date"><?= h(format_tanggal($invitation['tanggal_acara'] ?? '', 'l, d F Y')) ?></p>
 
@@ -39,7 +47,7 @@ if (!$countdownTo && !empty($events)) $countdownTo = $events[0]['tanggal_mulai']
   <section class="section-block">
     <article class="card text-center" data-aos="fade-up">
       <p class="eyebrow">The Wedding Of</p>
-      <h2 class="couple-title"><?= h($pria['nama_panggilan'] ?? '') ?> &amp; <?= h($wanita['nama_panggilan'] ?? '') ?></h2>
+      <h2 class="couple-title"><?= h($priaShort) ?> &amp; <?= h($wanitaShort) ?></h2>
       <div class="cover-divider"><span class="line"></span><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.5-9.5-9C1.2 9 3 5 7 5c2 0 3.5 1 5 3 1.5-2 3-3 5-3 4 0 5.8 4 4.5 7-2 4.5-9.5 9-9.5 9z"/></svg><span class="line"></span></div>
       <p class="couple-date"><?= h(format_tanggal($invitation['tanggal_acara'] ?? '', 'l, d F Y')) ?></p>
       <div class="countdown" id="countdown">
@@ -86,11 +94,14 @@ if (!$countdownTo && !empty($events)) $countdownTo = $events[0]['tanggal_mulai']
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </div>
             <?php endif; ?>
-            <h4 class="mempelai-name"><?= h($d['nama'] ?? '-') ?></h4>
+            <h4 class="mempelai-name"><?= h(!empty($d['nama']) ? $d['nama'] : '—') ?></h4>
             <?php if (!empty($d['deskripsi'])): ?><p class="mempelai-desc"><?= h($d['deskripsi']) ?></p><?php endif; ?>
-            <p class="mempelai-meta">Putra/Putri dari</p>
-            <p class="mempelai-meta">Bapak <strong><?= h($d['ayah'] ?? '-') ?></strong></p>
-            <p class="mempelai-meta">&amp; Ibu <strong><?= h($d['ibu'] ?? '-') ?></strong></p>
+            <?php $hasOrtu = !empty($d['ayah']) || !empty($d['ibu']); ?>
+            <?php if ($hasOrtu): ?>
+              <p class="mempelai-meta">Putra/Putri dari</p>
+              <?php if (!empty($d['ayah'])): ?><p class="mempelai-meta">Bapak <strong><?= h($d['ayah']) ?></strong></p><?php endif; ?>
+              <?php if (!empty($d['ibu'])):  ?><p class="mempelai-meta"><?= !empty($d['ayah']) ? '&amp; ' : '' ?>Ibu <strong><?= h($d['ibu']) ?></strong></p><?php endif; ?>
+            <?php endif; ?>
             <?php if (!empty($d['instagram'])): ?>
               <a href="https://instagram.com/<?= h(ltrim($d['instagram'],'@')) ?>" target="_blank" class="ig-link">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.4A4 4 0 1 1 12.6 8 4 4 0 0 1 16 11.4z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
@@ -305,7 +316,7 @@ if (!$countdownTo && !empty($events)) $countdownTo = $events[0]['tanggal_mulai']
     <article class="card text-center" data-aos="fade-up">
       <p class="closing-prose">Merupakan suatu kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada putra-putri kami.</p>
       <p class="closing-salam">Wassalamu'alaikum Warahmatullahi Wabarakatuh</p>
-      <p class="closing-couple"><?= h($pria['nama_panggilan'] ?? '') ?> &amp; <?= h($wanita['nama_panggilan'] ?? '') ?></p>
+      <p class="closing-couple"><?= h($priaShort) ?> &amp; <?= h($wanitaShort) ?></p>
     </article>
   </section>
 

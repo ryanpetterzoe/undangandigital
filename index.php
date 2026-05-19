@@ -79,11 +79,16 @@ $kisah    = $data['kisah'];
 $galeri   = $data['galeri'];
 $ucapan   = $data['ucapan'];
 
-// Find pria & wanita
+// Find pria & wanita (with fallback if peran not set)
 $pria = null; $wanita = null;
 foreach ($mempelai as $m) {
-    if ($m['peran'] === 'pria') $pria = $m;
+    if ($m['peran'] === 'pria')   $pria   = $m;
     if ($m['peran'] === 'wanita') $wanita = $m;
 }
+// Safety net: if rows exist but peran missing/swapped, just take the first two
+if (!$pria   && !empty($mempelai[0])) $pria   = $mempelai[0];
+if (!$wanita && !empty($mempelai[1])) $wanita = $mempelai[1];
+$pria   = $pria   ?: ['nama'=>'', 'nama_panggilan'=>'', 'foto'=>'', 'ayah'=>'', 'ibu'=>'', 'deskripsi'=>'', 'instagram'=>''];
+$wanita = $wanita ?: ['nama'=>'', 'nama_panggilan'=>'', 'foto'=>'', 'ayah'=>'', 'ibu'=>'', 'deskripsi'=>'', 'instagram'=>''];
 
 include $layout;

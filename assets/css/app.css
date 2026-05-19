@@ -316,6 +316,8 @@ a { color: var(--primary); }
   display: flex; align-items: center; justify-content: center;
   color: var(--primary);
   background: var(--primary-light);
+  border-width: 3px;
+  opacity: .9;
 }
 .mempelai-name {
   font-family: var(--font-script);
