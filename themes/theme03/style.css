@@ -1,0 +1,12 @@
+/* Theme 03 — Emerald Forest */
+.theme-theme03 {
+  --primary: #047857;
+  --primary-soft: #a7f3d0;
+  --bg-color: #ecfdf5;
+  --overlay-color: rgba(236, 253, 245, 0.5);
+  --text: #022c22;
+  --muted: #14532d;
+  --card-bg: rgba(255,255,255,0.55);
+  --card-border: rgba(167, 243, 208, 0.5);
+}
+.theme-theme03 .cover-title { color: #065f46; }

@@ -1,0 +1,30 @@
+# Undangan Digital - Apache rewrite rules
+# Mendukung vhost dan domain dinamis (Cloudflare-friendly)
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Auto-detect base path (mendukung subdir & vhost root)
+    # Pastikan AllowOverride All di vhost config
+
+    # Block direct access to sensitive files
+    RewriteRule ^(\.|config\.php|schema\.sql|composer\.(json|lock)) - [F,L]
+
+    # Skip rewrite untuk file/folder yang ada
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Skip untuk folder admin, client, invitation, assets, uploads, install
+    RewriteRule ^(admin|client|invitation|assets|uploads|themes|install\.php|index\.php) - [L]
+
+    # Slug routing: /rudidandiana -> index.php?slug=rudidandiana
+    RewriteRule ^([a-zA-Z0-9_-]+)/?$ index.php?slug=$1 [QSA,L]
+</IfModule>
+
+# Security
+<FilesMatch "^(config\.php|schema\.sql|\.env)$">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes
