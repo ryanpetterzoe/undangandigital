@@ -1,15 +1,10 @@
 <?php
-// install.php - Installer ala WordPress
-// Jalankan sekali: http://yourhost/install.php
-// Setelah selesai, file ini akan menulis config.php dan dapat dihapus.
-
 declare(strict_types=1);
 session_start();
 
 $installed = file_exists(__DIR__ . '/config.php');
 $step      = (int)($_GET['step'] ?? ($installed ? 9 : 1));
 $errors    = [];
-$success   = '';
 
 function h(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 
@@ -21,7 +16,6 @@ function write_config(array $cfg): bool {
 function run_schema(PDO $pdo, string $sqlFile): void {
     $sql = file_get_contents($sqlFile);
     if ($sql === false) throw new RuntimeException('schema.sql tidak ditemukan');
-    // Split per statement (cukup utk schema kita yg sederhana)
     foreach (array_filter(array_map('trim', explode(';', $sql))) as $stmt) {
         if ($stmt === '') continue;
         $pdo->exec($stmt);
@@ -30,7 +24,6 @@ function run_schema(PDO $pdo, string $sqlFile): void {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$installed) {
     $action = $_POST['action'] ?? '';
-
     if ($action === 'db') {
         $db = [
             'host' => trim($_POST['db_host'] ?? 'localhost'),
@@ -52,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$installed) {
             $errors[] = 'Gagal koneksi/instal DB: ' . $e->getMessage();
         }
     }
-
     if ($action === 'admin') {
         $username = trim($_POST['username'] ?? '');
         $nama     = trim($_POST['nama'] ?? '');
@@ -70,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$installed) {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare('INSERT INTO admins (username,password_hash,nama) VALUES (?,?,?)');
                 $stmt->execute([$username, $hash, $nama]);
-
                 $cfg = [
                     'db' => $db,
                     'app' => [
@@ -80,9 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$installed) {
                         'session_name'  => 'ud_sess',
                         'upload_max_mb' => 10,
                     ],
-                    'security' => [
-                        'app_key' => bin2hex(random_bytes(24)),
-                    ],
+                    'security' => ['app_key' => bin2hex(random_bytes(24))],
                 ];
                 if (!write_config($cfg)) {
                     $errors[] = 'Gagal menulis config.php (cek permission folder).';
@@ -100,58 +89,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$installed) {
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Installer - Undangan Digital</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Installer · Undangan Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="assets/css/admin.css" rel="stylesheet">
+<style>
+  .install-wrap { min-height:100vh; background: linear-gradient(135deg,#fff1f2,#fef3c7); padding: 24px; display:flex; align-items:center; justify-content:center; }
+  .install-card { width: 100%; max-width: 460px; }
+  .steps { display:flex; gap:8px; margin-bottom: 16px; }
+  .step { flex:1; height: 4px; background: #e2e8f0; border-radius: 4px; }
+  .step.active { background: var(--p); }
+</style>
 </head>
-<body class="bg-gradient-to-br from-rose-50 to-amber-50 min-h-screen">
-<div class="max-w-xl mx-auto p-6">
-  <h1 class="text-2xl font-bold text-rose-700 mb-2">Installer Undangan Digital</h1>
-  <p class="text-sm text-gray-600 mb-6">Konfigurasi database & admin pertama.</p>
-
-  <?php if ($errors): ?>
-    <div class="bg-red-100 border border-red-300 text-red-800 p-3 rounded mb-4">
-      <?php foreach ($errors as $e): ?><div><?= h($e) ?></div><?php endforeach; ?>
+<body>
+<div class="install-wrap">
+  <div class="install-card">
+    <div style="text-align:center;margin-bottom:18px">
+      <div class="auth-logo" style="margin:0 auto 10px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.5-9.5-9C1.2 9 3 5 7 5c2 0 3.5 1 5 3 1.5-2 3-3 5-3 4 0 5.8 4 4.5 7-2 4.5-9.5 9-9.5 9z"/></svg>
+      </div>
+      <h1 class="page-title" style="margin:0">Installer Undangan Digital</h1>
+      <p class="muted">Konfigurasi database & admin pertama</p>
     </div>
-  <?php endif; ?>
 
-  <?php if ($step === 9 || $installed): ?>
-    <div class="bg-white rounded-xl shadow p-6 border border-emerald-200">
-      <h2 class="text-xl font-semibold text-emerald-700 mb-2">Instalasi Selesai</h2>
-      <p class="text-gray-700 mb-4">Sistem siap digunakan. Untuk keamanan, hapus <code>install.php</code>.</p>
-      <a class="inline-block px-4 py-2 bg-rose-600 text-white rounded" href="admin/login.php">Masuk Admin</a>
+    <div class="steps">
+      <div class="step <?= $step>=1?'active':'' ?>"></div>
+      <div class="step <?= $step>=2?'active':'' ?>"></div>
+      <div class="step <?= $step>=9?'active':'' ?>"></div>
     </div>
-  <?php elseif ($step === 1): ?>
-    <form method="post" class="bg-white rounded-xl shadow p-6 space-y-3">
-      <input type="hidden" name="action" value="db">
-      <h2 class="font-semibold text-lg">Step 1 — Database</h2>
-      <label class="block text-sm">Host
-        <input name="db_host" value="localhost" class="w-full border rounded px-3 py-2"></label>
-      <label class="block text-sm">Port
-        <input name="db_port" value="3306" class="w-full border rounded px-3 py-2"></label>
-      <label class="block text-sm">Nama Database
-        <input name="db_name" value="undangandigital" class="w-full border rounded px-3 py-2" required></label>
-      <label class="block text-sm">User
-        <input name="db_user" value="root" class="w-full border rounded px-3 py-2"></label>
-      <label class="block text-sm">Password
-        <input type="password" name="db_pass" class="w-full border rounded px-3 py-2"></label>
-      <button class="w-full bg-rose-600 text-white py-2 rounded font-medium">Lanjut</button>
-    </form>
-  <?php else: // step 2 ?>
-    <form method="post" class="bg-white rounded-xl shadow p-6 space-y-3">
-      <input type="hidden" name="action" value="admin">
-      <h2 class="font-semibold text-lg">Step 2 — Akun Admin & Site</h2>
-      <label class="block text-sm">Nama Situs
-        <input name="site_name" value="Undangan Digital" class="w-full border rounded px-3 py-2"></label>
-      <label class="block text-sm">Nama Admin
-        <input name="nama" class="w-full border rounded px-3 py-2" required></label>
-      <label class="block text-sm">Username
-        <input name="username" class="w-full border rounded px-3 py-2" required></label>
-      <label class="block text-sm">Password (min 6)
-        <input type="password" name="password" class="w-full border rounded px-3 py-2" required></label>
-      <button class="w-full bg-rose-600 text-white py-2 rounded font-medium">Selesaikan Instalasi</button>
-    </form>
-  <?php endif; ?>
+
+    <?php if ($errors): ?>
+      <div class="alert error"><?php foreach ($errors as $e): ?><div><?= h($e) ?></div><?php endforeach; ?></div>
+    <?php endif; ?>
+
+    <?php if ($step === 9 || $installed): ?>
+      <div class="card">
+        <div class="card-body" style="text-align:center">
+          <div class="auth-logo" style="margin:0 auto 12px;background:linear-gradient(135deg,#34d399,#059669)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+          </div>
+          <h2 style="margin:0 0 6px">Instalasi Selesai!</h2>
+          <p class="muted mb-4">Untuk keamanan, hapus file <code>install.php</code>.</p>
+          <a class="btn btn-primary btn-block" href="admin/login.php">Masuk Admin</a>
+        </div>
+      </div>
+    <?php elseif ($step === 1): ?>
+      <form method="post" class="card">
+        <div class="card-head"><h2>Step 1 — Database</h2></div>
+        <div class="card-body form-row">
+          <input type="hidden" name="action" value="db">
+          <div><label class="label">Host</label><input class="input" name="db_host" value="localhost"></div>
+          <div class="grid-2">
+            <div><label class="label">Port</label><input class="input" name="db_port" value="3306"></div>
+            <div><label class="label">Database</label><input class="input" name="db_name" value="undangandigital" required></div>
+          </div>
+          <div class="grid-2">
+            <div><label class="label">User</label><input class="input" name="db_user" value="root"></div>
+            <div><label class="label">Password</label><input class="input" type="password" name="db_pass"></div>
+          </div>
+          <button class="btn btn-primary btn-block">Lanjut</button>
+        </div>
+      </form>
+    <?php else: ?>
+      <form method="post" class="card">
+        <div class="card-head"><h2>Step 2 — Akun Admin</h2></div>
+        <div class="card-body form-row">
+          <input type="hidden" name="action" value="admin">
+          <div><label class="label">Nama Situs</label><input class="input" name="site_name" value="Undangan Digital"></div>
+          <div><label class="label">Nama Admin</label><input class="input" name="nama" required></div>
+          <div><label class="label">Username</label><input class="input" name="username" required></div>
+          <div>
+            <label class="label">Password</label>
+            <input class="input" type="password" name="password" required>
+            <p class="field-help">Minimal 6 karakter</p>
+          </div>
+          <button class="btn btn-primary btn-block">Selesaikan Instalasi</button>
+        </div>
+      </form>
+    <?php endif; ?>
+  </div>
 </div>
 </body>
 </html>

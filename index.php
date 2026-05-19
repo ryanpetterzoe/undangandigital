@@ -7,24 +7,35 @@ require_once __DIR__ . '/includes/functions.php';
 $slug = trim($_GET['slug'] ?? '');
 
 if ($slug === '') {
-    // Landing page
     $site = $CONFIG['app']['site_name'] ?? 'Undangan Digital';
     ?><!doctype html>
     <html lang="id">
     <head>
       <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
       <title><?= h($site) ?></title>
-      <script src="https://cdn.tailwindcss.com"></script>
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Great+Vibes&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+      <link href="<?= h(asset('css/admin.css')) ?>" rel="stylesheet">
+      <style>
+        .hero { min-height: 100vh; min-height: 100dvh; background: linear-gradient(135deg,#fff1f2,#fef3c7); display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .hero-card { width: 100%; max-width: 480px; text-align: center; background: rgba(255,255,255,.85); border-radius: 22px; padding: 36px 26px; box-shadow: 0 20px 60px rgba(15,23,42,.08); border: 1px solid #fff; }
+        .hero .script { font-family: 'Great Vibes', cursive; font-size: 3.4rem; color: var(--p-dark); line-height: 1; margin: 0 0 6px; }
+        .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; margin: 0 0 10px; color: #0f172a; }
+        .hero p { color: var(--muted); margin: 0 0 22px; }
+      </style>
     </head>
-    <body class="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-pink-100 flex items-center justify-center p-6">
-      <div class="max-w-lg text-center bg-white/70 backdrop-blur rounded-2xl shadow-xl p-8 border border-rose-100">
-        <p style="font-family:'Great Vibes',cursive" class="text-5xl text-rose-700 mb-2">The Wedding</p>
-        <h1 class="text-2xl font-semibold text-slate-800 mb-2"><?= h($site) ?></h1>
-        <p class="text-slate-600 mb-6">Buat undangan pernikahan digital yang elegan, cepat, dan dapat dibagikan ke seluruh tamu Anda.</p>
-        <div class="flex justify-center gap-3">
-          <a href="<?= h(base_url('admin/login.php')) ?>" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full">Masuk Admin</a>
+    <body>
+      <div class="hero">
+        <div class="hero-card">
+          <p class="script">The Wedding</p>
+          <h1><?= h($site) ?></h1>
+          <p>Buat undangan pernikahan digital yang elegan, cepat, dan mudah dibagikan ke seluruh tamu Anda.</p>
+          <a href="<?= h(base_url('admin/login.php')) ?>" class="btn btn-primary btn-block">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span>Masuk Admin</span>
+          </a>
         </div>
       </div>
     </body>
