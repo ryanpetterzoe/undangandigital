@@ -16,20 +16,32 @@ $site = $CONFIG['app']['site_name'] ?? 'Undangan Digital';
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Login Admin &middot; <?= h($site) ?></title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="<?= h(asset('css/admin.css')) ?>" rel="stylesheet">
 </head>
-<body class="min-h-screen bg-gradient-to-br from-rose-50 to-amber-50 flex items-center justify-center p-6">
-<form method="post" class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
-  <h1 class="text-xl font-semibold text-rose-700 mb-1">Login Admin</h1>
-  <p class="text-sm text-slate-500 mb-5"><?= h($site) ?></p>
-  <?php if ($error): ?><div class="bg-red-50 text-red-700 border border-red-200 p-2 rounded mb-3 text-sm"><?= h($error) ?></div><?php endif; ?>
-  <label class="block text-sm mb-2">Username
-    <input name="username" class="w-full border rounded-lg px-3 py-2 mt-1" required></label>
-  <label class="block text-sm mb-4">Password
-    <input type="password" name="password" class="w-full border rounded-lg px-3 py-2 mt-1" required></label>
-  <button class="w-full bg-rose-600 hover:bg-rose-700 text-white py-2 rounded-lg font-medium">Masuk</button>
+<body class="auth-page">
+<form method="post" class="auth-card" autocomplete="on">
+  <div class="auth-logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.5-9.5-9C1.2 9 3 5 7 5c2 0 3.5 1 5 3 1.5-2 3-3 5-3 4 0 5.8 4 4.5 7-2 4.5-9.5 9-9.5 9z"/></svg>
+  </div>
+  <h1 class="page-title" style="margin:0">Masuk Admin</h1>
+  <p class="muted mb-4"><?= h($site) ?></p>
+  <?php if ($error): ?><div class="alert error"><?= h($error) ?></div><?php endif; ?>
+  <div class="form-row">
+    <div>
+      <label class="label" for="u">Username</label>
+      <input id="u" class="input" name="username" required autofocus>
+    </div>
+    <div>
+      <label class="label" for="p">Password</label>
+      <input id="p" class="input" name="password" type="password" required>
+    </div>
+    <button class="btn btn-primary btn-block">Masuk</button>
+  </div>
 </form>
 </body>
 </html>

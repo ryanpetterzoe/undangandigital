@@ -1,12 +1,16 @@
 <?php
 $pageTitle = 'Edit Undangan';
+$activeNav = 'mempelai';
 require_once __DIR__ . '/../includes/admin_header.php';
 
 $id = (int)($_GET['id'] ?? 0);
 $inv = $pdo->prepare('SELECT * FROM invitations WHERE id=?');
 $inv->execute([$id]);
 $invitation = $inv->fetch();
-if (!$invitation) { echo '<p>Undangan tidak ditemukan.</p>'; require_once __DIR__.'/../includes/admin_footer.php'; exit; }
+if (!$invitation) {
+    echo '<div class="alert error">Undangan tidak ditemukan.</div>';
+    require_once __DIR__.'/../includes/admin_footer.php'; exit;
+}
 
 $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,11 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $a = $_POST['action'] ?? '';
 
     if ($a === 'invitation') {
-        // Background upload
         $bg = $invitation['background'];
         $newBg = upload_file('background', 'bg');
         if ($newBg) $bg = $newBg;
-        // QRIS upload
         $qris = $invitation['qris'];
         $newQ = upload_file('qris_file', 'qris');
         if ($newQ) $qris = $newQ;
@@ -73,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $eid = (int)($_POST['eid'] ?? 0);
         $data = [
             $_POST['jenis'] ?? '',
-            $_POST['tanggal_mulai'] ?? null,
+            $_POST['tanggal_mulai'] ?: null,
             $_POST['tanggal_selesai'] ?: null,
             $_POST['tempat'] ?? '',
             $_POST['alamat'] ?? '',
@@ -134,7 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msg = 'Foto dihapus.';
     }
 
-    // Reload
     $inv->execute([$id]);
     $invitation = $inv->fetch();
 }
@@ -149,197 +150,312 @@ $galeri   = $pdo->prepare('SELECT * FROM galeri WHERE invitation_id=? ORDER BY u
 $galeri->execute([$id]); $galeri = $galeri->fetchAll();
 
 $themes = list_themes();
+$tab = $_GET['tab'] ?? 'detail';
+$tabs = [
+    'detail' => 'Detail',
+    'mempelai' => 'Mempelai',
+    'acara' => 'Acara',
+    'kisah' => 'Kisah Cinta',
+    'galeri' => 'Galeri',
+];
 ?>
-<div class="flex items-center mb-3">
-  <h1 class="text-2xl font-semibold">Edit: <?= h($invitation['judul']) ?></h1>
-  <a target="_blank" href="<?= h(base_url($invitation['slug'])) ?>" class="ml-auto text-sm text-rose-600">Pratinjau /<?= h($invitation['slug']) ?> &rarr;</a>
+<div class="page-header">
+  <a href="<?= h(base_url('admin/mempelai.php')) ?>" class="btn btn-icon btn-outline" aria-label="Kembali">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>
+  </a>
+  <h1 class="page-title" style="margin:0"><?= h($invitation['judul']) ?></h1>
+  <span class="spacer"></span>
+  <a target="_blank" href="<?= h(base_url($invitation['slug'])) ?>" class="btn btn-soft btn-sm">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    <span>Pratinjau</span>
+  </a>
 </div>
-<?php if ($msg): ?><div class="bg-emerald-50 text-emerald-700 border border-emerald-200 p-2 rounded mb-3 text-sm"><?= h($msg) ?></div><?php endif; ?>
 
-<div class="grid md:grid-cols-2 gap-4">
-  <!-- DETAIL UTAMA -->
-  <form method="post" enctype="multipart/form-data" class="bg-white border rounded-xl p-5 space-y-3">
-    <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-    <input type="hidden" name="action" value="invitation">
-    <h2 class="font-semibold">Detail Utama</h2>
-    <label class="block text-sm">Judul <input name="judul" value="<?= h($invitation['judul']) ?>" class="w-full border rounded px-3 py-2 mt-1"></label>
-    <label class="block text-sm">Tanggal Acara <input type="date" name="tanggal_acara" value="<?= h($invitation['tanggal_acara']) ?>" class="w-full border rounded px-3 py-2 mt-1"></label>
-    <label class="block text-sm">Tema
-      <select name="tema" class="w-full border rounded px-3 py-2 mt-1">
-        <?php foreach ($themes as $t): ?>
-          <option value="<?= h($t) ?>" <?= $invitation['tema']===$t?'selected':'' ?>><?= h($t) ?></option>
+<?php if ($msg): ?><div class="alert success"><?= h($msg) ?></div><?php endif; ?>
+
+<div class="card mb-4">
+  <nav class="tabs">
+    <?php foreach ($tabs as $key=>$lbl): ?>
+      <a class="tab <?= $tab===$key?'active':'' ?>" href="?id=<?= $id ?>&tab=<?= $key ?>"><?= h($lbl) ?></a>
+    <?php endforeach; ?>
+  </nav>
+
+<?php if ($tab === 'detail'): ?>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data" class="form-row">
+      <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+      <input type="hidden" name="action" value="invitation">
+
+      <div class="grid-2">
+        <div>
+          <label class="label">Judul</label>
+          <input class="input" name="judul" value="<?= h($invitation['judul']) ?>">
+        </div>
+        <div>
+          <label class="label">Tanggal Acara</label>
+          <input class="input" type="date" name="tanggal_acara" value="<?= h($invitation['tanggal_acara']) ?>">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label class="label">Tema</label>
+          <select class="select" name="tema">
+            <?php foreach ($themes as $t): ?>
+              <option value="<?= h($t) ?>" <?= $invitation['tema']===$t?'selected':'' ?>><?= h($t) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div>
+          <label class="label">Background (gambar)</label>
+          <input class="input" type="file" name="background" accept="image/*">
+          <?php if ($invitation['background']): ?><img src="<?= h(upload_url($invitation['background'])) ?>" class="mt-2" style="max-height:80px;border-radius:8px"><?php endif; ?>
+        </div>
+      </div>
+
+      <div>
+        <label class="label">Quote Arab</label>
+        <textarea class="textarea" name="quote_arab" dir="rtl" rows="2"><?= h($invitation['quote_arab']) ?></textarea>
+      </div>
+      <div>
+        <label class="label">Arti / Terjemahan</label>
+        <textarea class="textarea" name="quote_arti" rows="2"><?= h($invitation['quote_arti']) ?></textarea>
+      </div>
+      <div>
+        <label class="label">Kalimat Mohon Doa Restu</label>
+        <textarea class="textarea" name="doa_restu" rows="2"><?= h($invitation['doa_restu']) ?></textarea>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label class="label">Live Streaming - Teks</label>
+          <textarea class="textarea" name="livestream_text" rows="2"><?= h($invitation['livestream_text']) ?></textarea>
+        </div>
+        <div>
+          <label class="label">Live Streaming - URL</label>
+          <input class="input" name="livestream_url" value="<?= h($invitation['livestream_url']) ?>" placeholder="https://youtube.com/...">
+        </div>
+      </div>
+
+      <div>
+        <label class="label">Bank/Rekening (multi-baris)</label>
+        <textarea class="textarea" name="bank_info" rows="3" placeholder="BCA 1234567890 a.n. Rudi&#10;BRI 0987654321 a.n. Diana"><?= h($invitation['bank_info']) ?></textarea>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label class="label">QRIS (gambar)</label>
+          <input class="input" type="file" name="qris_file" accept="image/*">
+          <?php if ($invitation['qris']): ?><img src="<?= h(upload_url($invitation['qris'])) ?>" class="mt-2" style="max-height:80px;border-radius:8px"><?php endif; ?>
+        </div>
+        <div>
+          <label class="label">No. Konfirmasi (WhatsApp)</label>
+          <input class="input" name="mohon_konfirmasi" value="<?= h($invitation['mohon_konfirmasi']) ?>" placeholder="628xxxxxxxxxx">
+        </div>
+      </div>
+
+      <div class="card" style="background:var(--bg);box-shadow:none">
+        <div class="card-body">
+          <p class="muted mb-3"><strong>Visibility</strong> — atur card mana yang ditampilkan</p>
+          <div class="grid-2">
+            <label class="checkbox"><input type="checkbox" name="show_livestream" <?= $invitation['show_livestream']?'checked':'' ?>> Live Streaming</label>
+            <label class="checkbox"><input type="checkbox" name="show_kisah" <?= $invitation['show_kisah']?'checked':'' ?>> Kisah Cinta</label>
+            <label class="checkbox"><input type="checkbox" name="show_galeri" <?= $invitation['show_galeri']?'checked':'' ?>> Galeri</label>
+            <label class="checkbox"><input type="checkbox" name="show_kado" <?= $invitation['show_kado']?'checked':'' ?>> RSVP &amp; Kado</label>
+            <label class="checkbox"><input type="checkbox" name="is_active" <?= $invitation['is_active']?'checked':'' ?>> Undangan Aktif</label>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary">Simpan Detail</button>
+    </form>
+  </div>
+
+<?php elseif ($tab === 'mempelai'): ?>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data" class="form-row">
+      <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+      <input type="hidden" name="action" value="mempelai">
+      <div class="grid-2">
+        <?php foreach ($mempelai as $mp): ?>
+          <fieldset class="card" style="box-shadow:none">
+            <div class="card-head">
+              <h2 style="text-transform:capitalize">Mempelai <?= h($mp['peran']) ?></h2>
+            </div>
+            <div class="card-body form-row">
+              <div><label class="label">Nama Lengkap</label><input class="input" name="mp[<?= (int)$mp['id'] ?>][nama]" value="<?= h($mp['nama']) ?>"></div>
+              <div><label class="label">Nama Panggilan</label><input class="input" name="mp[<?= (int)$mp['id'] ?>][nama_panggilan]" value="<?= h($mp['nama_panggilan']) ?>"></div>
+              <div class="grid-2">
+                <div><label class="label">Ayah</label><input class="input" name="mp[<?= (int)$mp['id'] ?>][ayah]" value="<?= h($mp['ayah']) ?>"></div>
+                <div><label class="label">Ibu</label><input class="input" name="mp[<?= (int)$mp['id'] ?>][ibu]" value="<?= h($mp['ibu']) ?>"></div>
+              </div>
+              <div><label class="label">Instagram</label><input class="input" name="mp[<?= (int)$mp['id'] ?>][instagram]" value="<?= h($mp['instagram']) ?>" placeholder="@username"></div>
+              <div><label class="label">Deskripsi</label><textarea class="textarea" name="mp[<?= (int)$mp['id'] ?>][deskripsi]" rows="2"><?= h($mp['deskripsi']) ?></textarea></div>
+              <div>
+                <label class="label">Foto</label>
+                <input class="input" type="file" name="mp_foto[<?= (int)$mp['id'] ?>]" accept="image/*">
+                <?php if ($mp['foto']): ?><img src="<?= h(upload_url($mp['foto'])) ?>" class="mt-2" style="height:80px;width:80px;border-radius:50%;object-fit:cover"><?php endif; ?>
+              </div>
+            </div>
+          </fieldset>
         <?php endforeach; ?>
-      </select></label>
-    <label class="block text-sm">Background (gambar transparan/ornamen)
-      <input type="file" name="background" accept="image/*" class="w-full border rounded px-3 py-2 mt-1">
-      <?php if ($invitation['background']): ?><img src="<?= h(upload_url($invitation['background'])) ?>" class="h-20 mt-2 rounded"><?php endif; ?>
-    </label>
-    <label class="block text-sm">Quote Arab <textarea name="quote_arab" rows="2" class="w-full border rounded px-3 py-2 mt-1" dir="rtl"><?= h($invitation['quote_arab']) ?></textarea></label>
-    <label class="block text-sm">Arti / Terjemahan <textarea name="quote_arti" rows="2" class="w-full border rounded px-3 py-2 mt-1"><?= h($invitation['quote_arti']) ?></textarea></label>
-    <label class="block text-sm">Kalimat Mohon Doa Restu <textarea name="doa_restu" rows="2" class="w-full border rounded px-3 py-2 mt-1"><?= h($invitation['doa_restu']) ?></textarea></label>
-    <label class="block text-sm">Live Streaming - Teks <textarea name="livestream_text" rows="2" class="w-full border rounded px-3 py-2 mt-1"><?= h($invitation['livestream_text']) ?></textarea></label>
-    <label class="block text-sm">Live Streaming - URL <input name="livestream_url" value="<?= h($invitation['livestream_url']) ?>" class="w-full border rounded px-3 py-2 mt-1"></label>
-    <label class="block text-sm">Bank/Rekening (multi-baris) <textarea name="bank_info" rows="3" class="w-full border rounded px-3 py-2 mt-1" placeholder="BCA 1234567890 a.n. Rudi&#10;BRI 0987654321 a.n. Diana"><?= h($invitation['bank_info']) ?></textarea></label>
-    <label class="block text-sm">QRIS (gambar)
-      <input type="file" name="qris_file" accept="image/*" class="w-full border rounded px-3 py-2 mt-1">
-      <?php if ($invitation['qris']): ?><img src="<?= h(upload_url($invitation['qris'])) ?>" class="h-20 mt-2 rounded"><?php endif; ?>
-    </label>
-    <label class="block text-sm">No. Konfirmasi (WhatsApp) <input name="mohon_konfirmasi" value="<?= h($invitation['mohon_konfirmasi']) ?>" class="w-full border rounded px-3 py-2 mt-1" placeholder="628xxxxxxxxxx"></label>
-    <div class="grid grid-cols-2 gap-2 text-sm">
-      <label class="flex items-center gap-2"><input type="checkbox" name="show_livestream" <?= $invitation['show_livestream']?'checked':'' ?>> Live Streaming</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="show_kisah" <?= $invitation['show_kisah']?'checked':'' ?>> Kisah Cinta</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="show_galeri" <?= $invitation['show_galeri']?'checked':'' ?>> Galeri</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="show_kado" <?= $invitation['show_kado']?'checked':'' ?>> Kado/RSVP</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="is_active" <?= $invitation['is_active']?'checked':'' ?>> Aktif</label>
-    </div>
-    <button class="bg-rose-600 text-white px-4 py-2 rounded">Simpan Detail</button>
-  </form>
+      </div>
+      <button class="btn btn-primary">Simpan Mempelai</button>
+    </form>
+  </div>
 
-  <!-- MEMPELAI -->
-  <form method="post" enctype="multipart/form-data" class="bg-white border rounded-xl p-5 space-y-4">
-    <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-    <input type="hidden" name="action" value="mempelai">
-    <h2 class="font-semibold">Mempelai</h2>
-    <?php foreach ($mempelai as $mp): ?>
-      <fieldset class="border rounded-lg p-3">
-        <legend class="px-1 text-xs uppercase text-slate-500"><?= h($mp['peran']) ?></legend>
-        <label class="block text-sm">Nama Lengkap <input name="mp[<?= (int)$mp['id'] ?>][nama]" value="<?= h($mp['nama']) ?>" class="w-full border rounded px-3 py-2 mt-1"></label>
-        <label class="block text-sm">Nama Panggilan <input name="mp[<?= (int)$mp['id'] ?>][nama_panggilan]" value="<?= h($mp['nama_panggilan']) ?>" class="w-full border rounded px-3 py-2 mt-1"></label>
-        <label class="block text-sm">Ayah <input name="mp[<?= (int)$mp['id'] ?>][ayah]" value="<?= h($mp['ayah']) ?>" class="w-full border rounded px-3 py-2 mt-1"></label>
-        <label class="block text-sm">Ibu <input name="mp[<?= (int)$mp['id'] ?>][ibu]" value="<?= h($mp['ibu']) ?>" class="w-full border rounded px-3 py-2 mt-1"></label>
-        <label class="block text-sm">Instagram <input name="mp[<?= (int)$mp['id'] ?>][instagram]" value="<?= h($mp['instagram']) ?>" class="w-full border rounded px-3 py-2 mt-1"></label>
-        <label class="block text-sm">Deskripsi <textarea name="mp[<?= (int)$mp['id'] ?>][deskripsi]" rows="2" class="w-full border rounded px-3 py-2 mt-1"><?= h($mp['deskripsi']) ?></textarea></label>
-        <label class="block text-sm">Foto <input type="file" name="mp_foto[<?= (int)$mp['id'] ?>]" accept="image/*" class="w-full border rounded px-3 py-2 mt-1">
-          <?php if ($mp['foto']): ?><img src="<?= h(upload_url($mp['foto'])) ?>" class="h-20 mt-2 rounded-full"><?php endif; ?>
-        </label>
-      </fieldset>
-    <?php endforeach; ?>
-    <button class="bg-rose-600 text-white px-4 py-2 rounded">Simpan Mempelai</button>
-  </form>
-</div>
+<?php elseif ($tab === 'acara'): ?>
+  <div class="card-body">
+    <p class="muted mb-3">Tambah, edit, atau hapus acara (Akad, Resepsi, dll.)</p>
+    <div class="form-row">
+      <?php foreach ($events as $e): ?>
+        <form method="post" class="card" style="box-shadow:none">
+          <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+          <input type="hidden" name="action" value="event_save">
+          <input type="hidden" name="eid" value="<?= (int)$e['id'] ?>">
+          <div class="card-body form-row">
+            <div class="grid-2">
+              <div><label class="label">Jenis</label><input class="input" name="jenis" value="<?= h($e['jenis']) ?>"></div>
+              <div><label class="label">Urutan</label><input class="input" type="number" name="urutan" value="<?= (int)$e['urutan'] ?>"></div>
+            </div>
+            <div class="grid-2">
+              <div><label class="label">Mulai</label><input class="input" type="datetime-local" name="tanggal_mulai" value="<?= h(str_replace(' ','T',substr($e['tanggal_mulai'],0,16))) ?>"></div>
+              <div><label class="label">Selesai</label><input class="input" type="datetime-local" name="tanggal_selesai" value="<?= h(str_replace(' ','T',substr((string)$e['tanggal_selesai'],0,16))) ?>"></div>
+            </div>
+            <div><label class="label">Tempat</label><input class="input" name="tempat" value="<?= h($e['tempat']) ?>"></div>
+            <div><label class="label">Alamat</label><input class="input" name="alamat" value="<?= h($e['alamat']) ?>"></div>
+            <div><label class="label">Google Maps URL</label><input class="input" name="maps_url" value="<?= h($e['maps_url']) ?>"></div>
+            <div class="row">
+              <button class="btn btn-primary btn-sm">Simpan</button>
+            </div>
+          </div>
+        </form>
+        <form method="post" onsubmit="return confirm('Hapus acara?')" style="text-align:right;margin-top:-8px">
+          <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+          <input type="hidden" name="action" value="event_delete">
+          <input type="hidden" name="eid" value="<?= (int)$e['id'] ?>">
+          <button class="btn btn-danger btn-sm">Hapus acara ini</button>
+        </form>
+      <?php endforeach; ?>
 
-<!-- ACARA -->
-<div class="bg-white border rounded-xl p-5 mt-4">
-  <h2 class="font-semibold mb-3">Acara</h2>
-  <table class="w-full text-sm mb-4">
-    <thead class="bg-slate-50"><tr>
-      <th class="text-left p-2">Jenis</th><th class="text-left p-2">Mulai</th><th class="text-left p-2">Selesai</th><th class="text-left p-2">Tempat</th><th></th>
-    </tr></thead>
-    <tbody>
-    <?php foreach ($events as $e): ?>
-      <tr class="border-t align-top">
-        <td class="p-2">
-          <form method="post" class="space-y-1">
-            <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-            <input type="hidden" name="action" value="event_save">
-            <input type="hidden" name="eid" value="<?= (int)$e['id'] ?>">
-            <input name="jenis" value="<?= h($e['jenis']) ?>" class="border rounded px-2 py-1 w-full">
-        </td>
-        <td class="p-2"><input type="datetime-local" name="tanggal_mulai" value="<?= h(str_replace(' ','T',substr($e['tanggal_mulai'],0,16))) ?>" class="border rounded px-2 py-1 w-full"></td>
-        <td class="p-2"><input type="datetime-local" name="tanggal_selesai" value="<?= h(str_replace(' ','T',substr((string)$e['tanggal_selesai'],0,16))) ?>" class="border rounded px-2 py-1 w-full"></td>
-        <td class="p-2">
-          <input name="tempat" value="<?= h($e['tempat']) ?>" placeholder="Nama tempat" class="border rounded px-2 py-1 w-full mb-1">
-          <input name="alamat" value="<?= h($e['alamat']) ?>" placeholder="Alamat singkat" class="border rounded px-2 py-1 w-full mb-1">
-          <input name="maps_url" value="<?= h($e['maps_url']) ?>" placeholder="Google Maps URL" class="border rounded px-2 py-1 w-full">
-        </td>
-        <td class="p-2 text-right whitespace-nowrap">
-          <button class="text-emerald-700">Simpan</button>
-          </form>
-          <form method="post" class="inline" onsubmit="return confirm('Hapus acara?')">
-            <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-            <input type="hidden" name="action" value="event_delete">
-            <input type="hidden" name="eid" value="<?= (int)$e['id'] ?>">
-            <button class="text-red-600 ml-2">Hapus</button>
-          </form>
-        </td>
-      </tr>
-    <?php endforeach; ?>
-    <!-- Tambah baru -->
-    <tr class="border-t bg-amber-50/30">
-      <form method="post"><input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>"><input type="hidden" name="action" value="event_save">
-      <td class="p-2"><input name="jenis" placeholder="Akad / Resepsi / dll" class="border rounded px-2 py-1 w-full"></td>
-      <td class="p-2"><input type="datetime-local" name="tanggal_mulai" class="border rounded px-2 py-1 w-full"></td>
-      <td class="p-2"><input type="datetime-local" name="tanggal_selesai" class="border rounded px-2 py-1 w-full"></td>
-      <td class="p-2">
-        <input name="tempat" placeholder="Tempat" class="border rounded px-2 py-1 w-full mb-1">
-        <input name="alamat" placeholder="Alamat singkat" class="border rounded px-2 py-1 w-full mb-1">
-        <input name="maps_url" placeholder="Google Maps URL" class="border rounded px-2 py-1 w-full">
-      </td>
-      <td class="p-2 text-right"><button class="text-rose-600">+ Tambah</button></td>
-      </form>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- KISAH -->
-<div class="bg-white border rounded-xl p-5 mt-4">
-  <h2 class="font-semibold mb-3">Kisah Cinta</h2>
-  <div class="space-y-3">
-    <?php foreach ($kisah as $k): ?>
-      <form method="post" enctype="multipart/form-data" class="border rounded-lg p-3 grid md:grid-cols-4 gap-2 items-start">
+      <form method="post" class="card" style="box-shadow:none;border-style:dashed;background:var(--bg)">
         <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-        <input type="hidden" name="action" value="kisah_save">
-        <input type="hidden" name="kid" value="<?= (int)$k['id'] ?>">
-        <input name="judul" value="<?= h($k['judul']) ?>" class="border rounded px-2 py-1" placeholder="Judul">
-        <input name="tanggal" value="<?= h($k['tanggal']) ?>" class="border rounded px-2 py-1" placeholder="2020 / Mei 2021">
-        <textarea name="deskripsi" rows="2" class="border rounded px-2 py-1 md:col-span-2" placeholder="Deskripsi"><?= h($k['deskripsi']) ?></textarea>
-        <input type="file" name="kisah_foto" accept="image/*" class="border rounded px-2 py-1">
-        <input type="number" name="urutan" value="<?= (int)$k['urutan'] ?>" class="border rounded px-2 py-1 w-24" placeholder="Urutan">
-        <?php if ($k['foto']): ?><img src="<?= h(upload_url($k['foto'])) ?>" class="h-16 rounded"><?php else: ?><span></span><?php endif; ?>
-        <div class="text-right">
-          <button class="text-emerald-700">Simpan</button>
+        <input type="hidden" name="action" value="event_save">
+        <div class="card-head"><h2>+ Tambah Acara Baru</h2></div>
+        <div class="card-body form-row">
+          <div class="grid-2">
+            <div><label class="label">Jenis</label><input class="input" name="jenis" placeholder="Akad / Resepsi"></div>
+            <div><label class="label">Urutan</label><input class="input" type="number" name="urutan" value="0"></div>
+          </div>
+          <div class="grid-2">
+            <div><label class="label">Mulai</label><input class="input" type="datetime-local" name="tanggal_mulai"></div>
+            <div><label class="label">Selesai</label><input class="input" type="datetime-local" name="tanggal_selesai"></div>
+          </div>
+          <div><label class="label">Tempat</label><input class="input" name="tempat"></div>
+          <div><label class="label">Alamat</label><input class="input" name="alamat"></div>
+          <div><label class="label">Google Maps URL</label><input class="input" name="maps_url"></div>
+          <button class="btn btn-primary">Tambah Acara</button>
         </div>
       </form>
-    <?php endforeach; ?>
-    <form method="post" enctype="multipart/form-data" class="border-2 border-dashed rounded-lg p-3 grid md:grid-cols-4 gap-2 bg-amber-50/30">
-      <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-      <input type="hidden" name="action" value="kisah_save">
-      <input name="judul" class="border rounded px-2 py-1" placeholder="Judul (mis. Pertemuan Pertama)">
-      <input name="tanggal" class="border rounded px-2 py-1" placeholder="Tanggal/periode">
-      <textarea name="deskripsi" rows="2" class="border rounded px-2 py-1 md:col-span-2" placeholder="Deskripsi"></textarea>
-      <input type="file" name="kisah_foto" accept="image/*" class="border rounded px-2 py-1">
-      <input type="number" name="urutan" value="0" class="border rounded px-2 py-1 w-24" placeholder="Urutan">
-      <span></span>
-      <div class="text-right"><button class="text-rose-600">+ Tambah Kisah</button></div>
-    </form>
-    <?php if (!$kisah): ?>
-      <form method="post" class="hidden"></form>
-    <?php endif; ?>
-    <?php // delete forms ?>
-    <?php foreach ($kisah as $k): ?>
-      <form method="post" class="text-right -mt-3" onsubmit="return confirm('Hapus kisah?')">
-        <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-        <input type="hidden" name="action" value="kisah_delete">
-        <input type="hidden" name="kid" value="<?= (int)$k['id'] ?>">
-        <button class="text-xs text-red-600">hapus #<?= (int)$k['id'] ?></button>
-      </form>
-    <?php endforeach; ?>
+    </div>
   </div>
+
+<?php elseif ($tab === 'kisah'): ?>
+  <div class="card-body">
+    <p class="muted mb-3">Tambah cerita perjalanan kalian — pertemuan pertama, lamaran, dll.</p>
+    <div class="form-row">
+      <?php foreach ($kisah as $k): ?>
+        <form method="post" enctype="multipart/form-data" class="card" style="box-shadow:none">
+          <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+          <input type="hidden" name="action" value="kisah_save">
+          <input type="hidden" name="kid" value="<?= (int)$k['id'] ?>">
+          <div class="card-body form-row">
+            <div class="grid-2">
+              <div><label class="label">Judul</label><input class="input" name="judul" value="<?= h($k['judul']) ?>"></div>
+              <div><label class="label">Tanggal/Periode</label><input class="input" name="tanggal" value="<?= h($k['tanggal']) ?>" placeholder="Mei 2021"></div>
+            </div>
+            <div><label class="label">Deskripsi</label><textarea class="textarea" name="deskripsi" rows="2"><?= h($k['deskripsi']) ?></textarea></div>
+            <div class="grid-2">
+              <div>
+                <label class="label">Foto (ganti)</label>
+                <input class="input" type="file" name="kisah_foto" accept="image/*">
+                <?php if ($k['foto']): ?><img src="<?= h(upload_url($k['foto'])) ?>" class="mt-2" style="max-height:80px;border-radius:8px"><?php endif; ?>
+              </div>
+              <div><label class="label">Urutan</label><input class="input" type="number" name="urutan" value="<?= (int)$k['urutan'] ?>"></div>
+            </div>
+            <div class="row-end">
+              <button class="btn btn-primary btn-sm">Simpan</button>
+            </div>
+          </div>
+        </form>
+        <form method="post" onsubmit="return confirm('Hapus kisah?')" style="text-align:right;margin-top:-8px">
+          <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+          <input type="hidden" name="action" value="kisah_delete">
+          <input type="hidden" name="kid" value="<?= (int)$k['id'] ?>">
+          <button class="btn btn-danger btn-sm">Hapus kisah ini</button>
+        </form>
+      <?php endforeach; ?>
+
+      <form method="post" enctype="multipart/form-data" class="card" style="box-shadow:none;border-style:dashed;background:var(--bg)">
+        <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+        <input type="hidden" name="action" value="kisah_save">
+        <div class="card-head"><h2>+ Tambah Kisah</h2></div>
+        <div class="card-body form-row">
+          <div class="grid-2">
+            <div><label class="label">Judul</label><input class="input" name="judul" placeholder="Pertemuan Pertama"></div>
+            <div><label class="label">Tanggal/Periode</label><input class="input" name="tanggal"></div>
+          </div>
+          <div><label class="label">Deskripsi</label><textarea class="textarea" name="deskripsi" rows="2"></textarea></div>
+          <div class="grid-2">
+            <div><label class="label">Foto</label><input class="input" type="file" name="kisah_foto" accept="image/*"></div>
+            <div><label class="label">Urutan</label><input class="input" type="number" name="urutan" value="0"></div>
+          </div>
+          <button class="btn btn-primary">Tambah Kisah</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<?php else: // galeri ?>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data" class="row mb-4">
+      <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+      <input type="hidden" name="action" value="galeri_add">
+      <input class="input" type="file" name="galeri_files[]" multiple accept="image/*" style="flex:1;min-width:200px">
+      <button class="btn btn-primary">Upload</button>
+    </form>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      <?php foreach ($galeri as $g): ?>
+        <div style="position:relative;border-radius:12px;overflow:hidden">
+          <img src="<?= h(upload_url($g['foto'])) ?>" style="width:100%;height:140px;object-fit:cover">
+          <form method="post" style="position:absolute;top:6px;right:6px" onsubmit="return confirm('Hapus foto?')">
+            <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
+            <input type="hidden" name="action" value="galeri_delete">
+            <input type="hidden" name="gid" value="<?= (int)$g['id'] ?>">
+            <button class="btn btn-icon" style="background:rgba(220,38,38,.95);color:#fff;width:28px;height:28px;border-radius:999px;padding:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </form>
+        </div>
+      <?php endforeach; if (!$galeri): ?>
+        <div class="empty-state" style="grid-column:1/-1">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+          <p>Belum ada foto. Upload foto-foto kalian.</p>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+<?php endif; ?>
 </div>
 
-<!-- GALERI -->
-<div class="bg-white border rounded-xl p-5 mt-4">
-  <h2 class="font-semibold mb-3">Galeri Foto</h2>
-  <form method="post" enctype="multipart/form-data" class="mb-4 flex items-center gap-2">
-    <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-    <input type="hidden" name="action" value="galeri_add">
-    <input type="file" name="galeri_files[]" multiple accept="image/*" class="border rounded px-3 py-2">
-    <button class="bg-rose-600 text-white px-4 py-2 rounded">Upload</button>
-  </form>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-    <?php foreach ($galeri as $g): ?>
-      <div class="relative group">
-        <img src="<?= h(upload_url($g['foto'])) ?>" class="h-32 w-full object-cover rounded-lg">
-        <form method="post" class="absolute top-1 right-1" onsubmit="return confirm('Hapus foto?')">
-          <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
-          <input type="hidden" name="action" value="galeri_delete">
-          <input type="hidden" name="gid" value="<?= (int)$g['id'] ?>">
-          <button class="bg-red-600/90 text-white w-6 h-6 rounded-full text-xs">x</button>
-        </form>
-      </div>
-    <?php endforeach; ?>
-  </div>
-</div>
+<style>
+@media (min-width: 768px) {
+  #galeri-grid, .galeri-grid { grid-template-columns: repeat(4, 1fr) !important; }
+}
+</style>
+<script>
+// Make galeri grid 4-col on tablet+
+(function(){var g=document.querySelectorAll('[style*="grid-template-columns:repeat(2,1fr)"]'); for(var i=0;i<g.length;i++){g[i].classList.add('galeri-grid');}})();
+</script>
 
 <?php require_once __DIR__ . '/../includes/admin_footer.php'; ?>
