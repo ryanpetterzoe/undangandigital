@@ -16,14 +16,14 @@ if ($slug === '') {
       <title><?= h($site) ?></title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Great+Vibes&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Philosopher:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
       <link href="<?= h(asset('css/admin.css')) ?>" rel="stylesheet">
       <style>
-        .hero { min-height: 100vh; min-height: 100dvh; background: linear-gradient(135deg,#fff1f2,#fef3c7); display: flex; align-items: center; justify-content: center; padding: 24px; }
-        .hero-card { width: 100%; max-width: 480px; text-align: center; background: rgba(255,255,255,.85); border-radius: 22px; padding: 36px 26px; box-shadow: 0 20px 60px rgba(15,23,42,.08); border: 1px solid #fff; }
-        .hero .script { font-family: 'Great Vibes', cursive; font-size: 3.4rem; color: var(--p-dark); line-height: 1; margin: 0 0 6px; }
-        .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; margin: 0 0 10px; color: #0f172a; }
-        .hero p { color: var(--muted); margin: 0 0 22px; }
+        .hero { min-height: 100vh; min-height: 100dvh; background: linear-gradient(135deg,#eef2f9,#f3e8ee); display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .hero-card { width: 100%; max-width: 480px; text-align: center; background: rgba(255,255,255,.85); border-radius: 22px; padding: 40px 28px; box-shadow: 0 20px 60px rgba(15,23,42,.08); border: 1px solid #fff; }
+        .hero .script { font-family: 'Great Vibes', cursive; font-size: 3.6rem; color: var(--p); line-height: 1; margin: 0 0 6px; }
+        .hero h1 { font-family: 'Philosopher', serif; font-size: 1.7rem; font-weight: 700; margin: 0 0 10px; color: var(--text); }
+        .hero p { color: var(--muted); margin: 0 0 24px; line-height: 1.7; }
       </style>
     </head>
     <body>

@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$installed) {
 <title>Installer · Undangan Digital</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Philosopher:wght@400;700&display=swap" rel="stylesheet">
 <link href="assets/css/admin.css" rel="stylesheet">
 <style>
   .install-wrap { min-height:100vh; background: linear-gradient(135deg,#fff1f2,#fef3c7); padding: 24px; display:flex; align-items:center; justify-content:center; }

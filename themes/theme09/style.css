@@ -1,13 +1,8 @@
 /* Theme 09 — Pastel Peach */
 .theme-theme09 {
-  --primary: #db2777;
-  --primary-soft: #fbcfe8;
-  --bg-color: #fff1f2;
-  --overlay-color: rgba(255,241,242,0.45);
-  --text: #4a1d2a;
-  --muted: #9d174d;
-  --card-bg: rgba(255,255,255,0.5);
-  --card-border: rgba(251, 207, 232, 0.7);
+  --primary:        #d18c8c;
+  --primary-hover:  #c47878;
+  --primary-light:  #f6dcdc;
+  --secondary:      #e8b8b8;
+  --secondary-light:#f9e8e8;
 }
-.theme-theme09 .cover-title { color: #be185d; }
-.theme-theme09 .countdown-grid .cd { background: rgba(251,207,232,.45); }

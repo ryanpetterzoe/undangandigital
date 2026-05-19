@@ -1,12 +1,8 @@
 /* Theme 06 — Ocean Blue */
 .theme-theme06 {
-  --primary: #0369a1;
-  --primary-soft: #bae6fd;
-  --bg-color: #f0f9ff;
-  --overlay-color: rgba(240,249,255,0.5);
-  --text: #0c2d48;
-  --muted: #075985;
-  --card-bg: rgba(255,255,255,0.55);
-  --card-border: rgba(186, 230, 253, 0.6);
+  --primary:        #4a7a9c;
+  --primary-hover:  #3d6a8a;
+  --primary-light:  #d8e6ee;
+  --secondary:      #b8d8d8;
+  --secondary-light:#e6f0ef;
 }
-.theme-theme06 .cover-title { color: #0c4a6e; }

@@ -1,13 +1,8 @@
 /* Theme 10 — Tropical Botanical */
 .theme-theme10 {
-  --primary: #166534;
-  --primary-soft: #bbf7d0;
-  --bg-color: #f7fee7;
-  --overlay-color: rgba(247,254,231,0.45);
-  --text: #14532d;
-  --muted: #3f6212;
-  --card-bg: rgba(255,255,255,0.55);
-  --card-border: rgba(187, 247, 208, 0.6);
+  --primary:        #4d7553;
+  --primary-hover:  #3e6244;
+  --primary-light:  #d8e6dc;
+  --secondary:      #b8a779;
+  --secondary-light:#ede4d0;
 }
-.theme-theme10 .cover-title { color: #166534; }
-.theme-theme10 .eyebrow { color: #15803d; }

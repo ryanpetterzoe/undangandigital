@@ -1,14 +1,8 @@
 /* Theme 08 — Monochrome Classic */
 .theme-theme08 {
-  --primary: #111827;
-  --primary-soft: #d1d5db;
-  --bg-color: #f9fafb;
-  --overlay-color: rgba(249,250,251,0.5);
-  --text: #111827;
-  --muted: #4b5563;
-  --card-bg: rgba(255,255,255,0.6);
-  --card-border: rgba(209, 213, 219, 0.7);
-  --serif: 'Playfair Display', serif;
+  --primary:        #2c2c2c;
+  --primary-hover:  #1a1a1a;
+  --primary-light:  #e8e8e8;
+  --secondary:      #8b8b8b;
+  --secondary-light:#f0f0f0;
 }
-.theme-theme08 .cover-title { color: #111827; letter-spacing: .02em; }
-.theme-theme08 .eyebrow { color: #6b7280; font-family: var(--serif); font-style: italic; font-size: 1.1rem; }

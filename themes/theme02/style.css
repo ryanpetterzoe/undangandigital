@@ -1,14 +1,8 @@
-/* Theme 02 — Ivory Gold */
+/* Theme 02 — Rose Gold */
 .theme-theme02 {
-  --primary: #a16207;
-  --primary-soft: #fde68a;
-  --bg-color: #fffdf6;
-  --overlay-color: rgba(255, 251, 235, 0.5);
-  --text: #3a2c10;
-  --muted: #6b5126;
-  --card-bg: rgba(255, 255, 255, 0.55);
-  --card-border: rgba(253, 230, 138, 0.5);
-  --serif: 'Playfair Display', serif;
+  --primary:        #c08176;
+  --primary-hover:  #b06d61;
+  --primary-light:  #f6e5e1;
+  --secondary:      #d4a373;
+  --secondary-light:#f7e8d6;
 }
-.theme-theme02 .cover-title { color: #854d0e; letter-spacing: .04em; }
-.theme-theme02 .countdown-grid .cd { background: rgba(254,243,199,.6); }
