@@ -1,0 +1,12 @@
+/* Theme 01 — Rose Garden (default) */
+.theme-theme01 {
+  --primary: #be185d;
+  --primary-soft: #fda4af;
+  --bg-color: #fff5f7;
+  --overlay-color: rgba(255, 245, 247, 0.55);
+  --text: #3f1f2c;
+  --muted: #7a4a5c;
+  --card-bg: rgba(255, 255, 255, 0.55);
+  --card-border: rgba(253, 164, 175, 0.35);
+}
+.theme-theme01 .cover-title { color: #9f1239; }

@@ -1,0 +1,18 @@
+/* Theme 04 — Midnight Navy */
+.theme-theme04 {
+  --primary: #c2a262;
+  --primary-soft: #fde68a;
+  --bg-color: #0f172a;
+  --overlay-color: rgba(15, 23, 42, 0.55);
+  --text: #f1f5f9;
+  --muted: #cbd5e1;
+  --card-bg: rgba(15, 23, 42, 0.45);
+  --card-border: rgba(194, 162, 98, 0.4);
+}
+.theme-theme04 .cover-title { color: #fde68a; }
+.theme-theme04 .countdown-grid .cd { background: rgba(15,23,42,0.55); border-color: rgba(194,162,98,.3); }
+.theme-theme04 .countdown-grid .cd span { color: #fde68a; }
+.theme-theme04 .input { background: rgba(15,23,42,0.4); color: #f1f5f9; border-color: rgba(255,255,255,.15); }
+.theme-theme04 .input::placeholder { color: #94a3b8; }
+.theme-theme04 .btn-outline { color: #fde68a; border-color: #fde68a; background: transparent; }
+.theme-theme04 .ucapan-item { background: rgba(15,23,42,0.55); }

@@ -1,0 +1,12 @@
+/* Theme 07 — Terracotta Sunset */
+.theme-theme07 {
+  --primary: #b45309;
+  --primary-soft: #fed7aa;
+  --bg-color: #fff7ed;
+  --overlay-color: rgba(255,247,237,0.5);
+  --text: #431407;
+  --muted: #9a3412;
+  --card-bg: rgba(255,255,255,0.55);
+  --card-border: rgba(254, 215, 170, 0.6);
+}
+.theme-theme07 .cover-title { color: #9a3412; }

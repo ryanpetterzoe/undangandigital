@@ -1,0 +1,173 @@
+/* ==== Undangan Digital — Base styles (shared) ==== */
+:root {
+  --primary: #be185d;
+  --primary-soft: #fda4af;
+  --bg-image: none;
+  --bg-color: #fff5f7;
+  --overlay-color: rgba(255, 250, 245, 0.55);
+  --text: #3f2832;
+  --muted: #6b4f5b;
+  --card-bg: rgba(255, 255, 255, 0.55);
+  --card-border: rgba(255, 255, 255, 0.65);
+  --serif: 'Cormorant Garamond', 'Playfair Display', serif;
+  --script: 'Great Vibes', cursive;
+  --arab: 'Amiri', 'Scheherazade New', serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg-color);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.bg-layer {
+  position: fixed; inset: 0; z-index: -2;
+  background-image: var(--bg-image);
+  background-size: cover; background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--bg-color);
+}
+.bg-overlay {
+  position: fixed; inset: 0; z-index: -1;
+  background: var(--overlay-color);
+}
+
+.invitation-root { min-height: 100vh; }
+
+/* ==== Cover ==== */
+.cover-section {
+  min-height: 100vh;
+  background: var(--bg-image, none) center/cover no-repeat;
+  background-color: var(--bg-color);
+  position: relative;
+  transition: opacity .8s ease, transform .8s ease, max-height .8s ease;
+}
+.cover-section::before {
+  content: ""; position: absolute; inset: 0; background: var(--overlay-color);
+}
+.cover-inner { animation: fadeUp 1s ease both; }
+.cover-title { font-family: var(--serif); font-weight: 600; }
+.cover-eyebrow { font-family: var(--script); font-size: 1.5rem; letter-spacing: 0; text-transform: none; opacity: 1; color: var(--primary); }
+.cover-date { font-family: var(--serif); }
+.cover-btn {
+  background: var(--primary); color: #fff; border: 0;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.cover-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+.cover-section.cover-open {
+  opacity: 0; transform: translateY(-30px); pointer-events: none;
+  position: absolute; left: 0; right: 0; top: 0;
+}
+
+/* ==== Sections ==== */
+.section-block {
+  padding: 56px 18px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.card-elegant {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border);
+  border-radius: 22px;
+  padding: 32px 22px;
+  box-shadow: 0 12px 40px rgba(80, 30, 60, 0.08);
+}
+.eyebrow {
+  font-family: var(--script);
+  color: var(--primary);
+  font-size: 1.6rem;
+  text-align: center;
+  margin-bottom: .25rem;
+}
+.font-serif { font-family: var(--serif); }
+.couple-title { color: var(--primary); }
+.couple-date { color: var(--muted); }
+
+/* Countdown */
+.countdown-grid .cd {
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 14px;
+  padding: 12px 6px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+}
+.countdown-grid .cd span { display:block; font-size: 1.6rem; font-weight: 700; color: var(--primary); font-family: var(--serif); }
+.countdown-grid .cd small { font-size: .7rem; text-transform: uppercase; letter-spacing: .15em; color: var(--muted); }
+
+/* Mempelai */
+.mempelai-card { padding: 18px 12px; }
+
+/* Event card */
+.event-card {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 16px;
+  padding: 18px 14px;
+}
+
+/* Quote arab */
+.quote-arab { font-family: var(--arab); color: var(--primary); }
+
+/* Buttons */
+.btn-primary {
+  display: inline-block; background: var(--primary); color: #fff;
+  padding: 10px 20px; border-radius: 999px; border: 0; font-weight: 500;
+  text-decoration: none; cursor: pointer;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.btn-primary:hover { transform: translateY(-1px); opacity: .95; }
+.btn-outline {
+  display: inline-block; padding: 8px 14px; border-radius: 999px;
+  border: 1px solid var(--primary); color: var(--primary);
+  background: rgba(255,255,255,0.5); text-decoration: none; font-size: .85rem;
+  cursor: pointer;
+}
+.btn-outline:hover { background: var(--primary); color: #fff; }
+
+/* Form */
+.input {
+  width: 100%; padding: 10px 14px; border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.7);
+  font: inherit; outline: none;
+}
+.input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(190,24,93,.15); }
+
+/* Ucapan */
+.ucapan-item {
+  background: rgba(255,255,255,0.55);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 999px;
+  background: var(--primary); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: .85rem;
+}
+
+/* Bank row hover */
+.bank-row { transition: background .2s ease; }
+.bank-row:hover { background: rgba(255,255,255,0.7); }
+
+/* Animations */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+/* Hidden util when not loaded Tailwind */
+.hidden { display: none; }
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .section-block { padding: 40px 12px; }
+  .card-elegant { padding: 22px 16px; }
+  .cover-title { font-size: 2.5rem !important; }
+  .countdown-grid .cd span { font-size: 1.3rem; }
+}
