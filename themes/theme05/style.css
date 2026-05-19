@@ -1,0 +1,12 @@
+/* Theme 05 — Lavender Dream */
+.theme-theme05 {
+  --primary: #7c3aed;
+  --primary-soft: #ddd6fe;
+  --bg-color: #faf5ff;
+  --overlay-color: rgba(250,245,255,0.5);
+  --text: #2e1065;
+  --muted: #5b21b6;
+  --card-bg: rgba(255,255,255,0.55);
+  --card-border: rgba(221, 214, 254, 0.6);
+}
+.theme-theme05 .cover-title { color: #6d28d9; }
